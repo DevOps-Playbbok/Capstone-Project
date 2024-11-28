@@ -28,7 +28,7 @@ This repository allows you to automatically set up Google Cloud resources using 
 ## Getting Started
 1. Clone the repository:
     ```sh
-    git clone https://github.com/DeNA/dify-google-cloud-terraform.git
+    git clone https://github.com/DevOps-Playbbok/Capstone-Project.git
     ```
 
 2. Initialize Terraform:
@@ -72,9 +72,6 @@ terraform destroy
 
 Note: Cloud Storage, Cloud SQL, VPC, and VPC Peering cannot be deleted with the `terraform destroy` command. These are critical resources for data persistence. Access the console and carefully delete them. After that, use the `terraform destroy` command to ensure all resources have been deleted.
 
-## References
-- [Dify](https://dify.ai/)
-- [GitHub](https://github.com/langgenius/dify)
 
 ## License
 This software is licensed under the MIT License. See the LICENSE file for more details.
