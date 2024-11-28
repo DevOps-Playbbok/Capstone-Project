@@ -4,11 +4,11 @@ Terraform template for Dify on AWS
 
 ## Premise and summary
 
-- VPC はすでに構築済みであるものとします
-- 公式では SSRF 対策の Forward Proxy として Squid を利用していますが、ここでは省略しています
-- ElastiCache Redis のクラスターモードは接続エラーになったため無効にしています
-- PostgreSQL の `pgvector` を Vector Storage として利用しています
-- Aurora PostgreSQL Serverless で構築していますが、通常のものでも可能です
+- VPC 
+- Forward Proxy 
+- ElastiCache Redis 
+- PostgreSQL &`pgvector Vector Storage 
+- Aurora PostgreSQL Serverless
 
 ## Prerequisites
 
@@ -34,5 +34,3 @@ Terraform template for Dify on AWS
 
 8. Run `terraform apply`
 9. Run `terraform apply` again, if task is not started
-
-構築が完了し、ECS タスクがすべて起動したら Output の `dify_url` にアクセスしてください。
