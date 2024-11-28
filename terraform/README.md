@@ -1,4 +1,4 @@
-# dify-aws-terraform
+# AWS Infra terraform
 
 Terraform template for Dify on AWS
 
