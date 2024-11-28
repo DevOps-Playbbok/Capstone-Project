@@ -1,5 +1,5 @@
 ## dify-azure-terraform
-Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM based chat bot app on Azure with terraform.
+Deploy an LLM based chat bot app on Azure with terraform.
 
 ### Topology
 Front-end access:
