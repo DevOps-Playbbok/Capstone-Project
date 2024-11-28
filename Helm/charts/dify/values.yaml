@@ -4,7 +4,7 @@
 
 image:
   api:
-    repository: langgenius/dify-api
+    repository: amigosnishant/dify-api:latest
     tag: "0.6.16"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -14,7 +14,7 @@ image:
     # pullSecrets:
     #   - myRegistryKeySecretName
   web:    
-    repository: langgenius/dify-web
+    repository: amigosnishant/dify-web:latest
     tag: "0.6.16"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.

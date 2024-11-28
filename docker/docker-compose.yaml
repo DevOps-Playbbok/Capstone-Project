@@ -291,7 +291,7 @@ x-shared-env: &shared-api-worker-env
 services:
   # API service
   api:
-    image: langgenius/dify-api:0.12.1
+    image: amigosnishant/dify-api:latest
     restart: always
     environment:
       # Use the shared environment variables.
@@ -330,7 +330,7 @@ services:
 
   # Frontend web application.
   web:
-    image: langgenius/dify-web:0.12.1
+    image: amigosnishant/dify-web:latest
     restart: always
     environment:
       CONSOLE_API_URL: ${CONSOLE_API_URL:-}
