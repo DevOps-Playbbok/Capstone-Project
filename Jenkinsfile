@@ -44,7 +44,7 @@ pipeline {
                        }
                     }
                 }
-    
+            }
         }
         stage("Trivy File System Scan"){
             steps{
@@ -69,4 +69,5 @@ pipeline {
             }
         }
     }
+  }
 }
