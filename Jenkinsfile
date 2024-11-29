@@ -10,12 +10,6 @@ pipeline {
                 retry(3) {
                     cleanWs()  // Clean the workspace before checkout
                     
-                    // Set permissions on the workspace to ensure Jenkins can access all files
-                    sh '''
-                    sudo chown -R $(whoami):$(whoami) . || true
-                    sudo chmod -R 775 . || true
-                    '''
-                    
                     // Checkout the code with sparse paths
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/Fix/Readme.md']],
@@ -34,6 +28,12 @@ pipeline {
                                    credentialsId: 'jenkins-git']
                               ]
                     ])
+                    
+                    // Set permissions on the workspace after checkout to ensure Jenkins can access files
+                    sh '''
+                    sudo chown -R $(whoami):$(whoami) . || true
+                    sudo chmod -R 775 . || true
+                    '''
                 }
             }
         }
