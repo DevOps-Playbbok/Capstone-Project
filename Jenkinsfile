@@ -60,7 +60,7 @@ pipeline {
         stage("PROD Deployment") {
             steps {
                 script {
-                    def helmPath = 'Helm'
+                    def helmPath = 'Helm/charts/dify'
 
                     // Validate if the Helm directory exists
                     if (fileExists(helmPath)) {
