@@ -39,7 +39,7 @@ pipeline {
                         }
                     } else {
                         sh "cd docker && ls -l"
-                        sh "docker compose up -d"
+                        sh "docker compose -f docker-compose.yaml up -d"
                     }
                 }
             }
