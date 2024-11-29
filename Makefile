@@ -3,7 +3,7 @@ DOCKER_REGISTRY=amigosnishant
 
 WEB_IMAGE=$(DOCKER_REGISTRY)/dify-web
 API_IMAGE=$(DOCKER_REGISTRY)/dify-api
-VERSION=latest
+VERSION=linux-arm  # for amd --> latest && for arm --> linux-arm
 
 # Build Docker images
 build-web:
