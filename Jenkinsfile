@@ -57,23 +57,17 @@ pipeline {
             }
         }
         
-        stage("PROD Deployment") {
-            steps {
-                script {
-                    def helmPath = 'Helm/charts/dify'
+        script {
+            def helmPath = 'Helm/charts/dify'
+            def releaseName = 'dify'
+            def releaseExists = sh(script: "helm upgrade --install ${releaseName} ${helmPath} --dry-run --debug", returnStatus: true) == 0
 
-                    // Validate if the Helm directory exists
-                    if (fileExists(helmPath)) {
-                        sh "helm ls"
-                        sh "kubectl get nodes"
-                        sh "cd ${helmPath}"
-                        sh "ls -l ${helmPath}"
-                        sh "helm upgrade --install dify ${helmPath} --dry-run --debug"
-                        sh "helm upgrade --install dify ${helmPath}"
-                    } else {
-                        error "Helm directory not found. Ensure it is included in the repository and checkout."
-                    }
-                }
+            if (releaseExists) {
+                sh "helm upgrade --install ${releaseName} ${helmPath}"
+            } else {
+                sh "helm repo add dify https://borispolonsky.github.io/dify-helm"
+                sh "helm repo update"
+                sh "helm install my-release dify/dify"
             }
         }
     }
