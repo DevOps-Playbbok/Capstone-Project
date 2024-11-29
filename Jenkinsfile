@@ -29,7 +29,7 @@ pipeline {
                     def condition = false
                     
                     if (condition) {
-                        def dockerImage = "amigo-nishant/airbyte"
+                        def dockerImage = "amigo-nishant/dify"
                         def dockerTag = "latest"
                         
                         withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -37,12 +37,9 @@ pipeline {
                             sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
                             sh "docker push ${dockerImage}:${dockerTag}"
                         }
-                    } else {
-                        script {
-                         dir('docker') { 
+                    } else { 
                          sh 'docker compose -f docker-compose.yaml up -d'
                        }
-                    }
                 }
             }
         }
@@ -69,5 +66,4 @@ pipeline {
             }
         }
     }
-  }
 }
