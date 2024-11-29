@@ -60,7 +60,7 @@ pipeline {
                 sh "helm ls"
                 sh "kubectl get nodes"
                 sh "cd /var/lib/jenkins/workspace/Dify/Helm"
-                sh "ls -l /var/lib/jenkins/workspace/PROD/Helm/Chart.yaml"
+                sh "ls -l /var/lib/jenkins/workspace/PROD/Helm"
                 sh "helm upgrade --install Dify /var/lib/jenkins/workspace/PROD/Helm --dry-run --debug"
                 sh "helm upgrade --install Dify /var/lib/jenkins/workspace/PROD/Helm"
             }
