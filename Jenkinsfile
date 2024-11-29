@@ -5,7 +5,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = "dockerhub-credentials" 
     }
     stages {
-        stage("Code Checkout"){ 
+        stage("Code Checkout") { 
             steps {
                 retry(3) {
                     cleanWs()
@@ -16,6 +16,7 @@ pipeline {
                                    sparseCheckoutPaths: [
                                        [path: '.'],
                                        [path: 'docker/'],  // Ensure docker directory is included
+                                       [path: 'Helm/'],    // Include Helm directory
                                        [path: '!docker/volumes/db/data/pgdata/']
                                    ]
                                   ]
@@ -53,26 +54,35 @@ pipeline {
                 }
             }
         }
-        stage("Trivy File System Scan"){
-            steps{
-                sh "trivy fs --format  table -o trivy-fs-report.html ."
+        stage("Trivy File System Scan") {
+            steps {
+                sh "trivy fs --format table -o trivy-fs-report.html ."
             }
         }
-        stage("OWASP Dependency Check"){
-            steps{
+        stage("OWASP Dependency Check") {
+            steps {
                 echo "Skipping due to some dependency test cases are yet to be merged to main"
                 // dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'dc'
                 // dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
-        stage("PROD Deployment"){
-            steps{
-                sh "helm ls"
-                sh "kubectl get nodes"
-                sh "cd /var/lib/jenkins/workspace/Dify/Helm"
-                sh "ls -l /var/lib/jenkins/workspace/Dify/Helm"
-                sh "helm upgrade --install Dify /var/lib/jenkins/workspace/Dify/Helm --dry-run --debug"
-                sh "helm upgrade --install Dify /var/lib/jenkins/workspace/Dify/Helm"
+        stage("PROD Deployment") {
+            steps {
+                script {
+                    def helmPath = 'Helm'
+
+                    // Validate if the Helm directory exists
+                    if (fileExists(helmPath)) {
+                        sh "helm ls"
+                        sh "kubectl get nodes"
+                        sh "cd ${helmPath}"
+                        sh "ls -l ${helmPath}"
+                        sh "helm upgrade --install Dify ${helmPath} --dry-run --debug"
+                        sh "helm upgrade --install Dify ${helmPath}"
+                    } else {
+                        error "Helm directory not found. Ensure it is included in the repository and checkout."
+                    }
+                }
             }
         }
     }
