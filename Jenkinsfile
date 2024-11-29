@@ -68,8 +68,8 @@ pipeline {
                         sh "kubectl get nodes"
                         sh "cd ${helmPath}"
                         sh "ls -l ${helmPath}"
-                        sh "helm upgrade --install dify . --dry-run --debug"
-                        sh "helm upgrade --install dify ."
+                        sh "helm upgrade --install dify ${helmPath} --dry-run --debug"
+                        sh "helm upgrade --install dify ${helmPath}"
                     } else {
                         error "Helm directory not found. Ensure it is included in the repository and checkout."
                     }
