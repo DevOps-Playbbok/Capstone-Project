@@ -5,12 +5,19 @@ pipeline {
         DOCKER_CREDENTIALS_ID = "dockerhub-credentials" 
     }
     stages {
+        stage("Clean Workspace") {
+            steps {
+                script {
+                    // Clean the workspace if not already done
+                    cleanWs(cleanWhenSuccess: true)
+                }
+            }
+        }
+        
         stage("Code Checkout") { 
             steps {
                 retry(3) {
-                    cleanWs()  // Clean the workspace before checkout
-                    
-                    // Checkout the code with sparse paths
+                    cleanWs(cleanWhenSuccess: false) // Make sure workspace is cleaned before the checkout
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/Fix/Readme.md']],
                               extensions: [
@@ -19,7 +26,7 @@ pipeline {
                                        [path: '.'],
                                        [path: 'docker/'],  // Ensure docker directory is included
                                        [path: 'Helm/'],    // Include Helm directory
-                                       [path: '!docker/volumes/db/data/pgdata/']  // Exclude pgdata
+                                       [path: '!docker/volumes/db/data/pgdata/']
                                    ]
                                   ]
                               ],
@@ -28,15 +35,10 @@ pipeline {
                                    credentialsId: 'jenkins-git']
                               ]
                     ])
-                    
-                    // Set permissions on the workspace after checkout to ensure Jenkins can access files
-                    sh '''
-                    sudo chown -R $(whoami):$(whoami) . || true
-                    sudo chmod -R 775 . || true
-                    '''
                 }
             }
         }
+        
         stage("Docker Build, Tag, and Push DEV") {
             steps {
                 script {
@@ -62,11 +64,13 @@ pipeline {
                 }
             }
         }
+        
         stage("Trivy File System Scan") {
             steps {
                 sh "trivy fs --format table -o trivy-fs-report.html ."
             }
         }
+        
         stage("OWASP Dependency Check") {
             steps {
                 echo "Skipping due to some dependency test cases are yet to be merged to main"
@@ -74,6 +78,7 @@ pipeline {
                 // dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
+        
         stage("PROD Deployment") {
             steps {
                 script {
@@ -81,12 +86,6 @@ pipeline {
 
                     // Validate if the Helm directory exists
                     if (fileExists(helmPath)) {
-                        // Set permissions for Helm directory as well
-                        sh '''
-                        sudo chown -R $(whoami):$(whoami) ${helmPath} || true
-                        sudo chmod -R 775 ${helmPath} || true
-                        '''
-                        
                         sh "helm ls"
                         sh "kubectl get nodes"
                         sh "cd ${helmPath}"
