@@ -15,6 +15,7 @@ pipeline {
                                   [$class: 'SparseCheckoutPaths', 
                                    sparseCheckoutPaths: [
                                        [path: '.'],
+                                       [path: 'docker/'],  // Ensure docker directory is included
                                        [path: '!docker/volumes/db/data/pgdata/']
                                    ]
                                   ]
@@ -27,13 +28,6 @@ pipeline {
                 }
             }
         }
-        // stage("SonarQube Code Analysis") {
-        //    steps {
-        //        withSonarQubeEnv("Sonar") {
-        //            sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=Dify -Dsonar.projectKey=Dify"
-        //        }
-        //    }
-        // }
         stage("Docker Build, Tag, and Push DEV") {
             steps {
                 script {
@@ -49,7 +43,12 @@ pipeline {
                             sh "docker push ${dockerImage}:${dockerTag}"
                         }
                     } else { 
-                         sh 'cd docker && docker compose up -d'
+                        // Check if the docker directory exists
+                        if (fileExists('docker')) {
+                            sh 'cd docker && docker compose up -d'
+                        } else {
+                            error "Docker directory not found. Ensure it is included in the repository and checkout."
+                        }
                     }
                 }
             }
