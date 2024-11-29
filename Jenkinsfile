@@ -5,24 +5,24 @@ pipeline {
         DOCKER_CREDENTIALS_ID = "dockerhub-credentials" 
     }
     stages {
-        //stage("Code Checkout"){ 
-        //    steps{
-          //      git(
-            //        url: "https://github.com/DevOps-Playbbok/Capstone-Project.git",
-              //      branch: "Fix/Readme.md",
-                //    credentialsId: "jenkins-git",
-                  //  changelog: true,
-                    // poll: true
-                // )
-           // }
-        // }
-        stage("SonarQube Code Analysis") {
-            steps {
-                withSonarQubeEnv("Sonar") {
-                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=Dify -Dsonar.projectKey=Dify"
-                }
-            }
+        stage("Code Checkout"){ 
+            steps{
+                git(
+                    url: "https://github.com/DevOps-Playbbok/Capstone-Project.git",
+                    branch: "Fix/Readme.md",
+                    credentialsId: "jenkins-git",
+                    changelog: true,
+                    poll: true
+                   )
+              }
         }
+        // stage("SonarQube Code Analysis") {
+        //    steps {
+        //        withSonarQubeEnv("Sonar") {
+        //            sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=Dify -Dsonar.projectKey=Dify"
+        //        }
+        //    }
+       // }
       stage("Docker Build, Tag, and Push DEV") {
             steps {
                 script {
