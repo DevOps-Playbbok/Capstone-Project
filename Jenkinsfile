@@ -7,14 +7,22 @@ pipeline {
     stages {
         stage("Code Checkout"){ 
             steps{
-                git(
-                    url: "https://github.com/DevOps-Playbbok/Capstone-Project.git",
-                    branch: "Fix/Readme.md",
-                    credentialsId: "jenkins-git",
-                    changelog: true,
-                    poll: true
-                   )
-              }
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: '*/Fix/Readme.md']],
+                          extensions: [
+                              [$class: 'SparseCheckoutPaths', 
+                               sparseCheckoutPaths: [
+                                   [path: '.'],
+                                   [path: '!docker/volumes/db/data/pgdata/']
+                               ]
+                              ]
+                          ],
+                          userRemoteConfigs: [
+                              [url: 'https://github.com/DevOps-Playbbok/Capstone-Project.git', 
+                               credentialsId: 'jenkins-git']
+                          ]
+                ])
+            }
         }
         // stage("SonarQube Code Analysis") {
         //    steps {
@@ -23,7 +31,7 @@ pipeline {
         //        }
         //    }
        // }
-      stage("Docker Build, Tag, and Push DEV") {
+        stage("Docker Build, Tag, and Push DEV") {
             steps {
                 script {
                     def condition = false
