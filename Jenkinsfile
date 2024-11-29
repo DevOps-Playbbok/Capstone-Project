@@ -6,22 +6,25 @@ pipeline {
     }
     stages {
         stage("Code Checkout"){ 
-            steps{
-                checkout([$class: 'GitSCM', 
-                          branches: [[name: '*/Fix/Readme.md']],
-                          extensions: [
-                              [$class: 'SparseCheckoutPaths', 
-                               sparseCheckoutPaths: [
-                                   [path: '.'],
-                                   [path: '!docker/volumes/db/data/pgdata/']
-                               ]
+            steps {
+                retry(3) {
+                    cleanWs()
+                    checkout([$class: 'GitSCM', 
+                              branches: [[name: '*/Fix/Readme.md']],
+                              extensions: [
+                                  [$class: 'SparseCheckoutPaths', 
+                                   sparseCheckoutPaths: [
+                                       [path: '.'],
+                                       [path: '!docker/volumes/db/data/pgdata/']
+                                   ]
+                                  ]
+                              ],
+                              userRemoteConfigs: [
+                                  [url: 'https://github.com/DevOps-Playbbok/Capstone-Project.git', 
+                                   credentialsId: 'jenkins-git']
                               ]
-                          ],
-                          userRemoteConfigs: [
-                              [url: 'https://github.com/DevOps-Playbbok/Capstone-Project.git', 
-                               credentialsId: 'jenkins-git']
-                          ]
-                ])
+                    ])
+                }
             }
         }
         // stage("SonarQube Code Analysis") {
@@ -30,7 +33,7 @@ pipeline {
         //            sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=Dify -Dsonar.projectKey=Dify"
         //        }
         //    }
-       // }
+        // }
         stage("Docker Build, Tag, and Push DEV") {
             steps {
                 script {
@@ -47,7 +50,7 @@ pipeline {
                         }
                     } else { 
                          sh 'cd docker && docker compose up -d'
-                       }
+                    }
                 }
             }
         }
