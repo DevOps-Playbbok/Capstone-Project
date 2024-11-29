@@ -8,7 +8,15 @@ pipeline {
         stage("Code Checkout") { 
             steps {
                 retry(3) {
-                    cleanWs()
+                    cleanWs()  // Clean the workspace before checkout
+                    
+                    // Set permissions on the workspace to ensure Jenkins can access all files
+                    sh '''
+                    sudo chown -R $(whoami):$(whoami) . || true
+                    sudo chmod -R 775 . || true
+                    '''
+                    
+                    // Checkout the code with sparse paths
                     checkout([$class: 'GitSCM', 
                               branches: [[name: '*/Fix/Readme.md']],
                               extensions: [
@@ -17,7 +25,7 @@ pipeline {
                                        [path: '.'],
                                        [path: 'docker/'],  // Ensure docker directory is included
                                        [path: 'Helm/'],    // Include Helm directory
-                                       [path: '!docker/volumes/db/data/pgdata/']
+                                       [path: '!docker/volumes/db/data/pgdata/']  // Exclude pgdata
                                    ]
                                   ]
                               ],
@@ -73,6 +81,12 @@ pipeline {
 
                     // Validate if the Helm directory exists
                     if (fileExists(helmPath)) {
+                        // Set permissions for Helm directory as well
+                        sh '''
+                        sudo chown -R $(whoami):$(whoami) ${helmPath} || true
+                        sudo chmod -R 775 ${helmPath} || true
+                        '''
+                        
                         sh "helm ls"
                         sh "kubectl get nodes"
                         sh "cd ${helmPath}"
