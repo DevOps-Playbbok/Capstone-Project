@@ -327,10 +327,11 @@ kubectl get nodes
 ## Manual Setup only for port-forward 
 
 - Export Variables for the Pod and Port
-```bash
-export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=dify,app.kubernetes.io/instance=my-release,component=proxy" -o jsonpath="{.items[0].metadata.name}")
-export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-```
+  ```bash
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=dify,app.kubernetes.io/instance=my-release,component=proxy" -o jsonpath=" 
+  {.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  ```
 - Ensure the values are exported correctly by checking:
   ```bash
   echo $POD_NAME
