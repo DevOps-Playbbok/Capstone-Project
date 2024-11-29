@@ -38,8 +38,10 @@ pipeline {
                             sh "docker push ${dockerImage}:${dockerTag}"
                         }
                     } else {
-                        sh "cd docker && ls -l"
-                        sh "docker compose -f docker-compose.yaml up -d"
+                        script {
+                         dir('docker') { 
+                         sh 'docker compose -f docker-compose.yaml up -d'
+                       }
                     }
                 }
             }
