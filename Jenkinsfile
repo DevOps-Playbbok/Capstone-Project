@@ -70,5 +70,6 @@ pipeline {
                 sh "helm install my-release dify/dify"
             }
         }
+      }
     }
 }
