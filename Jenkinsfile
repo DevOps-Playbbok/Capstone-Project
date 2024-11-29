@@ -56,19 +56,23 @@ pipeline {
                 // dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
-    }
 
-    script {
-        def helmPath = 'Helm/charts/dify'
-        def releaseName = 'dify'
-        def releaseExists = sh(script: "helm upgrade --install ${releaseName} ${helmPath} --dry-run --debug", returnStatus: true) == 0
+        stage("Helm Deployment") {
+            steps {
+                script {
+                    def helmPath = 'Helm/charts/dify'
+                    def releaseName = 'dify'
+                    def releaseExists = sh(script: "helm upgrade --install ${releaseName} ${helmPath} --dry-run --debug", returnStatus: true) == 0
 
-        if (releaseExists) {
-            sh "helm upgrade --install ${releaseName} ${helmPath}"
-        } else {
-            sh "helm repo add dify https://borispolonsky.github.io/dify-helm"
-            sh "helm repo update"
-            sh "helm install my-release dify/dify"
+                    if (releaseExists) {
+                        sh "helm upgrade --install ${releaseName} ${helmPath}"
+                    } else {
+                        sh "helm repo add dify https://borispolonsky.github.io/dify-helm"
+                        sh "helm repo update"
+                        sh "helm install my-release dify/dify"
+                    }
+                }
+            }
         }
     }
 }
