@@ -61,6 +61,8 @@ pipeline {
                     } else { 
                         // Check if the docker directory exists
                         if (fileExists('docker')) {
+                            // Set the necessary permissions for the directory
+                            sh 'sudo chmod -R 777 docker/volumes/db/data/pgdata/'
                             sh 'cd docker && docker compose up -d'
                         } else {
                             error "Docker directory not found. Ensure it is included in the repository and checkout."
