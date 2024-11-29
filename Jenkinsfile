@@ -5,40 +5,41 @@ pipeline {
         DOCKER_CREDENTIALS_ID = "dockerhub-credentials" 
     }
     stages {
-        stage("Clean Workspace") {
+        stage("Check if Workspace Exists and Checkout Code") { 
             steps {
                 script {
-                    // Clean the workspace if not already done
-                    cleanWs(cleanWhenSuccess: true)
+                    def workspaceDir = pwd()
+                    def repoDir = "${workspaceDir}/Dify"
+                    
+                    // Check if the workspace directory exists
+                    if (fileExists(repoDir)) {
+                        echo "Workspace already exists. Skipping fresh clone."
+                    } else {
+                        echo "Workspace not found. Cloning the repository."
+                        retry(3) {
+                            checkout([$class: 'GitSCM', 
+                                      branches: [[name: '*/Fix/Readme.md']],
+                                      extensions: [
+                                          [$class: 'SparseCheckoutPaths', 
+                                           sparseCheckoutPaths: [
+                                               [path: '.'],
+                                               [path: 'docker/'],  // Ensure docker directory is included
+                                               [path: 'Helm/'],    // Include Helm directory
+                                               [path: '!docker/volumes/db/data/pgdata/']
+                                           ]
+                                          ]
+                                      ],
+                                      userRemoteConfigs: [
+                                          [url: 'https://github.com/DevOps-Playbbok/Capstone-Project.git', 
+                                           credentialsId: 'jenkins-git']
+                                      ]
+                            ])
+                        }
+                    }
                 }
             }
         }
-        
-        stage("Code Checkout") { 
-            steps {
-                retry(3) {
-                    cleanWs(cleanWhenSuccess: false) // Make sure workspace is cleaned before the checkout
-                    checkout([$class: 'GitSCM', 
-                              branches: [[name: '*/Fix/Readme.md']],
-                              extensions: [
-                                  [$class: 'SparseCheckoutPaths', 
-                                   sparseCheckoutPaths: [
-                                       [path: '.'],
-                                       [path: 'docker/'],  // Ensure docker directory is included
-                                       [path: 'Helm/'],    // Include Helm directory
-                                       [path: '!docker/volumes/db/data/pgdata/']
-                                   ]
-                                  ]
-                              ],
-                              userRemoteConfigs: [
-                                  [url: 'https://github.com/DevOps-Playbbok/Capstone-Project.git', 
-                                   credentialsId: 'jenkins-git']
-                              ]
-                    ])
-                }
-            }
-        }
-        
+
         stage("Docker Build, Tag, and Push DEV") {
             steps {
                 script {
