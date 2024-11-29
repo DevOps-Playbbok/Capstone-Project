@@ -24,8 +24,8 @@ pipeline {
                                            sparseCheckoutPaths: [
                                                [path: '.'],
                                                [path: 'docker/'],  // Ensure docker directory is included
-                                               [path: 'Helm/'],    // Ensure entire Helm directory is included (no exclusion)
-                                               [path: '!docker/volumes/db/data/pgdata/'] // Exclude large data directory
+                                               [path: 'Helm/'],    // Include Helm directory
+                                               [path: '!docker/volumes/db/data/pgdata/']
                                            ]
                                           ]
                                       ],
