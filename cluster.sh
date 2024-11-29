@@ -18,7 +18,7 @@ sudo apt-get update
 
 # Install Docker
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo usermod -aG docker $USER && newgrp docker
+# sudo usermod -aG docker $USER && newgrp docker
 
 # Install Helm
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
