@@ -15,7 +15,11 @@ pipeline {
                     if (fileExists(repoDir)) {
                         echo "Workspace already exists. Skipping fresh clone."
                     } else {
-                        echo "Workspace not found. Cloning the repository."
+                        echo "Workspace not found. Cleaning workspace and cloning the repository."
+                        
+                        // Clean the workspace only if the repo directory doesn't exist
+                        cleanWs()
+                        
                         retry(3) {
                             checkout([$class: 'GitSCM', 
                                       branches: [[name: '*/Fix/Readme.md']],
@@ -25,7 +29,7 @@ pipeline {
                                                [path: '.'],
                                                [path: 'docker/'],  // Ensure docker directory is included
                                                [path: 'Helm/'],    // Include Helm directory
-                                               [path: '!docker/volumes/db/data/pgdata/']
+                                               [path: '!docker/volumes/db/data/pgdata/']  // Exclude specific folder
                                            ]
                                           ]
                                       ],
