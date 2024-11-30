@@ -93,9 +93,6 @@ pipeline {
             namespaces.each { ns ->
                 echo "Checking if namespace '${ns}' exists..."
                 
-                // Check if the namespace exists
-                def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
-
                 if (nsExists) {
                     echo "Namespace '${ns}' already exists. Skipping creation."
                 } else {
