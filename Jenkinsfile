@@ -103,9 +103,11 @@ pipeline {
                 }
             }
             
-            // Debugging: Print the current context and namespaces
+            // Debugging: Ensure the correct context is used
             echo "Current Kubernetes context:"
             sh "kubectl config current-context"
+            sh "minikube status"  // Check minikube status
+
             echo "Listing all namespaces to verify creation:"
             sh "kubectl get namespaces"
         }
