@@ -321,6 +321,8 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 - Test as a jenkins user:
 ```bash
 kubectl get nodes
+kubectl create ns dev
+kubectl create ns prod
 ```
 # 
 
