@@ -86,22 +86,15 @@ pipeline {
     steps {
         script {
             echo "Ensuring namespaces 'dev' and 'prod' exist..."
-
-            // Define the namespaces to ensure
             def namespaces = ['dev', 'prod']
-
             namespaces.each { ns ->
-                echo "Checking if namespace '${ns}' exists..."
                 
-                // Check if the namespace exists
                 def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
 
                 if (nsExists) {
-                    echo "Namespace '${ns}' already exists. Skipping creation."
+                    echo "Namespace"
                 } else {
                     echo "Namespace '${ns}' does not exist. Creating it."
-
-                    // Create namespace using kubectl create ns
                     sh "kubectl create ns ${ns}"
                     echo "Namespace '${ns}' created successfully."
                 }
