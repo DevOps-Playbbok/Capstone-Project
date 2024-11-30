@@ -103,6 +103,7 @@ pipeline {
         }
     }
 }
+        }
 
         stage('Verify Namespaces') {
             steps {
