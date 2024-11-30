@@ -321,14 +321,16 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 - Test as a jenkins user:
 ```bash
 kubectl get nodes
+kubectl create ns dev
+kubectl create ns prod
 ```
 # 
 
 ## Manual Setup only for port-forward 
 
-- Export Variables for the Pod and Port
+- Export Variables for the Pod and Port and check **namespace** "DEV" or "PROD"
   ```bash
-  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=dify,app.kubernetes.io/instance=my-release,component=proxy" -o jsonpath=" 
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=dify,app.kubernetes.io/instance=release,component=proxy" -o jsonpath=" 
   {.items[0].metadata.name}")
   export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   ```
@@ -343,16 +345,11 @@ kubectl get nodes
   ```
 - Access the application: http://x.x.x.x:8080
 
+#
+
 ## Community & contact
 
 * [Github Discussion](https://github.com/langgenius/dify/discussions). Best for: sharing feedback and asking questions.
 * [GitHub Issues](https://github.com/langgenius/dify/issues). Best for: bugs you encounter using Dify.AI, and feature proposals. See our [Contribution Guide](https://github.com/langgenius/dify/blob/main/CONTRIBUTING.md).
 * [Discord](https://discord.gg/FngNHpbcY7). Best for: sharing your applications and hanging out with the community.
 * [X(Twitter)](https://twitter.com/dify_ai). Best for: sharing your applications and hanging out with the community.
-
-**Contributors**
-
-<a href="https://github.com/langgenius/dify/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=langgenius/dify" />
-</a>
-
