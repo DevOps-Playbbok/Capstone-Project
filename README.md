@@ -326,6 +326,27 @@ kubectl create ns prod
 ```
 # 
 
+## Manual Setup only for port-forward 
+
+- Export Variables for the Pod and Port
+  ```bash
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=dify,app.kubernetes.io/instance=my-release,component=proxy" -o jsonpath=" 
+  {.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  ```
+- Ensure the values are exported correctly by checking:
+  ```bash
+  echo $POD_NAME
+  echo $CONTAINER_PORT
+  ```
+- Run the port-forward command on the EC2 instance:
+  ```bash
+  kubectl --namespace default port-forward $POD_NAME 8080:$CONTAINER_PORT --address 0.0.0.0 &
+  ```
+- Access the application: http://x.x.x.x:8080
+
+#
+
 ## Community & contact
 
 * [Github Discussion](https://github.com/langgenius/dify/discussions). Best for: sharing feedback and asking questions.
