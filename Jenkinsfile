@@ -2,7 +2,14 @@ pipeline {
     agent any
     environment {
         SONAR_HOME = tool "Sonar"
-        DOCKER_CREDENTIALS_ID = "dockerhub-credentials"
+
+    parameters {
+        choice(
+            name: 'DEPLOY_ENV',
+            choices: ['dev', 'prod'],
+            description: 'Choose the environment to deploy: dev or prod'
+        )
+      }
     }
     stages {
         stage("Code Checkout") {
@@ -75,10 +82,29 @@ pipeline {
                 echo "Skipping due to some dependency test cases are yet to be merged to main"
             }
         }
-
-        stage("Helm Deployment") {
+         stage('Setup Namespaces') {
             steps {
                 script {
+                    def namespaces = ['dev', 'prod']
+
+                    namespaces.each { ns ->
+                        // Check if the namespace exists
+                        def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
+                        if (!nsExists) {
+                            echo "Namespace '${ns}' does not exist. Creating it."
+                            sh "kubectl create namespace ${ns}"
+                        } else {
+                            echo "Namespace '${ns}' already exists. Skipping creation."
+                        }
+                    }
+                }
+            }
+        }
+        stage("DEV Deployment") {
+            steps {
+                script {
+                    def namespace = params.DEPLOY_ENV
+                    echo "Deploying to namespace: ${namespace}"
                     def helmPath = 'Helm/charts/dify'
                     def releaseName = 'dify'
                     def releaseExists = sh(script: "helm upgrade --install ${releaseName} ${helmPath} --dry-run --debug", returnStatus: true) == 0
