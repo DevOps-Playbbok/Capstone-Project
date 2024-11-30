@@ -83,7 +83,7 @@ pipeline {
             }
         }
         stage('Setup Namespaces') {
-        steps {
+    steps {
         script {
             echo "Ensuring namespaces 'dev' and 'prod' exist..."
 
@@ -100,18 +100,9 @@ pipeline {
                     echo "Namespace '${ns}' already exists. Skipping creation."
                 } else {
                     echo "Namespace '${ns}' does not exist. Creating it."
-                    
-                    // Create namespace YAML dynamically for missing namespace
-                    def namespaceYaml = """
-                    apiVersion: v1
-                    kind: Namespace
-                    metadata:
-                      name: ${ns}
-                    """
-                    
-                    // Save to a temporary file and apply the YAML
-                    writeFile file: "${ns}-namespace.yaml", text: namespaceYaml
-                    sh "kubectl apply -f ${ns}-namespace.yaml"
+
+                    // Create namespace using kubectl create ns
+                    sh "kubectl create ns ${ns}"
                     echo "Namespace '${ns}' created successfully."
                 }
             }
