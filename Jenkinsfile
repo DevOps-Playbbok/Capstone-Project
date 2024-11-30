@@ -34,7 +34,7 @@ pipeline {
                     } else {
                         // Check if the docker directory exists
                         if (fileExists('docker')) {
-                            sh 'cd docker && docker compose up -d'
+                            sh 'cd docker'
                         } else {
                             error "Docker directory not found. Ensure it is included in the repository and checkout."
                         }
@@ -42,7 +42,28 @@ pipeline {
                 }
             }
         }
+        stage("SonarQube Code Analysis") {
+        steps {
+        withSonarQubeEnv("Sonar") {
+            sh """
+            $SONAR_HOME/bin/sonar-scanner \
+            -Dsonar.projectName=dify \
+            -Dsonar.projectKey=dify \
+            -Dsonar.sources=. \
+            -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/vendor/**,**/*.md
+            """
+                }
+            }
+        }
 
+        stage("Sonar Quality Gate Scan"){
+            steps{
+                timeout(time: 2, unit: "MINUTES"){
+                    waitForQualityGate abortPipeline: false
+                }
+            }
+        }
+        
         stage("Trivy File System Scan") {
             steps {
                 sh "trivy fs --format table -o trivy-fs-report.html ."
@@ -52,8 +73,6 @@ pipeline {
         stage("OWASP Dependency Check") {
             steps {
                 echo "Skipping due to some dependency test cases are yet to be merged to main"
-                // dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'dc'
-                // dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
 
