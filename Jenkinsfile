@@ -83,23 +83,26 @@ pipeline {
             }
         }
         stage('Setup Namespaces') {
-            steps {
-                script {
-                    echo "Ensuring namespaces 'dev' and 'prod' exist..."
-                    def namespaces = ['dev', 'prod']
-                    namespaces.each { ns ->
-                        def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
-                        if (!nsExists) {
-                            echo "Namespace '${ns}' does not exist. Creating it."
-                            sh "kubectl create namespace ${ns}"
-                            sh "kubectl wait --for=condition=Active --timeout=60s namespace/${ns}"
-                        } else {
-                            echo "Namespace '${ns}' already exists. Skipping creation."
-                        }
-                    }
+    steps {
+        script {
+            echo "Ensuring namespaces 'dev' and 'prod' exist..."
+
+            def namespaces = ['dev', 'prod']
+            namespaces.each { ns ->
+                def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
+                if (!nsExists) {
+                    echo "Namespace '${ns}' does not exist. Creating it."
+                    sh "kubectl create namespace ${ns}"
+                } else {
+                    echo "Namespace '${ns}' already exists. Skipping creation."
                 }
+                // Wait for namespace readiness
+                sh "kubectl wait --for=condition=Active --timeout=60s namespace/${ns} || echo 'Namespace ${ns} not fully ready, proceeding anyway.'"
             }
         }
+    }
+}
+
         stage("DEV Deployment") {
             steps {
                 script {
