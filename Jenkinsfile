@@ -82,27 +82,49 @@ pipeline {
                 echo "Skipping due to some dependency test cases are yet to be merged to main"
             }
         }
+
+        pipeline {
+    agent any
+
+    stages {
         stage('Setup Namespaces') {
-    steps {
-        script {
-            echo "Ensuring namespaces 'dev' and 'prod' exist..."
+            steps {
+                script {
+                    echo "Ensuring namespaces 'dev' and 'prod' exist..."
 
-            def namespaces = ['dev', 'prod']
-            namespaces.each { ns ->
-                // Check if namespace exists
-                def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
-                if (!nsExists) {
-                    echo "Namespace '${ns}' does not exist. Creating it."
-                    sh "kubectl create namespace ${ns}"
-                } else {
-                    echo "Namespace '${ns}' already exists. Skipping creation."
-                }
+                    // Create namespace manifest dynamically
+                    def namespaceYaml = """
+                    apiVersion: v1
+                    kind: Namespace
+                    metadata:
+                      name: dev
+                    ---
+                    apiVersion: v1
+                    kind: Namespace
+                    metadata:
+                      name: prod
+                    """
 
-                sleep(10)  // Wait for 10 seconds to ensure the namespace is fully initialized
-                    }
+                    // Save to a temporary file
+                    writeFile file: 'namespaces.yaml', text: namespaceYaml
+
+                    // Apply the YAML to create namespaces
+                    sh "kubectl apply -f namespaces.yaml"
                 }
             }
         }
+
+        stage('Verify Namespaces') {
+            steps {
+                script {
+                    echo "Listing all namespaces to verify creation:"
+                    sh "kubectl get namespaces"
+                }
+            }
+        }
+    }
+}
+
         stage("DEV Deployment") {
             steps {
                 script {
