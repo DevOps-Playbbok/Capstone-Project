@@ -82,28 +82,35 @@ pipeline {
                 echo "Skipping due to some dependency test cases are yet to be merged to main"
             }
         }
-        stage('Setup Namespaces') {
-            steps {
-        script {
-        echo "Ensuring namespaces 'dev' and 'prod' exist..."
-        def namespaces = ['dev', 'prod']
-        namespaces.each { ns ->
-            
-            // Check if the namespace exists
-            def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
 
-            // If the namespace doesn't exist, create it
-            if (!nsExists) {
-                echo "Namespace '${ns}' does not exist. Creating it."
-                sh "kubectl create ns ${ns}"
-                echo "Namespace '${ns}' created successfully."
-            } else {
-                echo "Namespace '${ns}' already exists."
+        stage('Setup Namespaces') {
+    steps {
+        script {
+            echo "Ensuring namespaces 'dev' and 'prod' exist..."
+            def namespaces = ['dev', 'prod']
+            namespaces.each { ns ->
+                
+                // Check if the namespace exists
+                def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
+
+                // If the namespace doesn't exist, create it
+                if (!nsExists) {
+                    echo "Namespace '${ns}' does not exist. Creating it."
+                    sh "kubectl create ns ${ns}"
+                    echo "Namespace '${ns}' created successfully."
+                } else {
+                    echo "Namespace '${ns}' already exists."
+                }
             }
+            
+            // Debugging: Print the current context and namespaces
+            echo "Current Kubernetes context:"
+            sh "kubectl config current-context"
+            echo "Listing all namespaces to verify creation:"
+            sh "kubectl get namespaces"
         }
     }
 }
-        }
 
         stage('Verify Namespaces') {
             steps {
