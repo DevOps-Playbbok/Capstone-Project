@@ -82,23 +82,41 @@ pipeline {
                 echo "Skipping due to some dependency test cases are yet to be merged to main"
             }
         }
-         stage('Setup Namespaces') {
+        stage('Setup Namespaces') {
             steps {
                 script {
-                    def namespaces = ['dev', 'prod']
+                echo "Ensuring namespaces 'dev' and 'prod' exist..."
 
-                    namespaces.each { ns ->
-                        // Check if the namespace exists
-                        def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
-                        if (!nsExists) {
-                            echo "Namespace '${ns}' does not exist. Creating it."
-                            sh "kubectl create namespace ${ns}"
-                        } else {
-                            echo "Namespace '${ns}' already exists. Skipping creation."
-                        }
+                // Define the namespaces to ensure
+                def namespaces = ['dev', 'prod']
+
+                namespaces.each { ns ->
+                echo "Checking if namespace '${ns}' exists..."
+                
+                // Check if the namespace exists
+                def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
+
+                if (nsExists) {
+                    echo "Namespace '${ns}' already exists. Skipping creation."
+                } else {
+                    echo "Namespace '${ns}' does not exist. Creating it."
+                    
+                    // Create namespace YAML dynamically for missing namespace
+                    def namespaceYaml = """
+                    apiVersion: v1
+                    kind: Namespace
+                    metadata:
+                      name: ${ns}
+                    """
+                    
+                    // Save to a temporary file and apply the YAML
+                    writeFile file: "${ns}-namespace.yaml", text: namespaceYaml
+                    sh "kubectl apply -f ${ns}-namespace.yaml"
+                    echo "Namespace '${ns}' created successfully."
                     }
-                }
-            }
+                 }
+              }
+          }
         }
         stage("DEV Deployment") {
             steps {
