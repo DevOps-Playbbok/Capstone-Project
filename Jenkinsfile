@@ -92,7 +92,7 @@ pipeline {
                 def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
 
                 if (nsExists) {
-                    echo "Namespace"
+                    sh "kubectl create ns ${ns}"
                 } else {
                     echo "Namespace '${ns}' does not exist. Creating it."
                     sh "kubectl create ns ${ns}"
@@ -102,7 +102,6 @@ pipeline {
         }
     }
 }
-
         stage('Verify Namespaces') {
             steps {
                 script {
