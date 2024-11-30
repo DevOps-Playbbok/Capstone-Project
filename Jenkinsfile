@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         SONAR_HOME = tool "Sonar"
-
+    }
     parameters {
         choice(
             name: 'DEPLOY_ENV',
@@ -10,7 +10,7 @@ pipeline {
             description: 'Choose the environment to deploy: dev or prod'
         )
       }
-    }
+    
     stages {
         stage("Code Checkout") {
             steps {
