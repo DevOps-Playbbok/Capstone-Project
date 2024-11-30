@@ -121,7 +121,6 @@ pipeline {
                 script {
                     echo "Listing all namespaces to verify creation:"
                     sh "kubectl get namespaces"
-                    sh "kubectl apply -f ${ns}-namespace.yaml || echo 'Failed to create namespace ${ns}'"
                 }
             }
         }
