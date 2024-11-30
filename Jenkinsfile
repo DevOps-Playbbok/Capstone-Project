@@ -9,8 +9,8 @@ pipeline {
             choices: ['dev', 'prod'],
             description: 'Choose the environment to deploy: dev or prod'
         )
-      }
-    
+    }
+
     stages {
         stage("Code Checkout") {
             steps {
@@ -39,7 +39,6 @@ pipeline {
                             sh "docker push ${dockerImage}:${dockerTag}"
                         }
                     } else {
-                        // Check if the docker directory exists
                         if (fileExists('docker')) {
                             sh 'cd docker'
                         } else {
@@ -49,28 +48,7 @@ pipeline {
                 }
             }
         }
-        //stage("SonarQube Code Analysis") {
-        //steps {
-        //withSonarQubeEnv("Sonar") {
-          //  sh """
-            //$SONAR_HOME/bin/sonar-scanner \
-            //-Dsonar.projectName=dify \
-            //-Dsonar.projectKey=dify \
-            //-Dsonar.sources=. \
-            //-Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/vendor/**,**/*.md
-            //"""
-              //  }
-            //}
-        //}
 
-        //stage("Sonar Quality Gate Scan"){
-          //  steps{
-            //    timeout(time: 2, unit: "MINUTES"){
-              //      waitForQualityGate abortPipeline: false
-                //}
-            //}
-        //}
-        
         stage("Trivy File System Scan") {
             steps {
                 sh "trivy fs --format table -o trivy-fs-report.html ."
@@ -84,35 +62,33 @@ pipeline {
         }
 
         stage('Setup Namespaces') {
-    steps {
-        script {
-            echo "Ensuring namespaces 'dev' and 'prod' exist..."
-            def namespaces = ['dev', 'prod']
-            namespaces.each { ns ->
-                
-                // Check if the namespace exists
-                def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
+            steps {
+                script {
+                    echo "Ensuring namespaces 'dev' and 'prod' exist..."
 
-                // If the namespace doesn't exist, create it
-                if (!nsExists) {
-                    echo "Namespace '${ns}' does not exist. Creating it."
-                    sh "kubectl create ns ${ns}"
-                    echo "Namespace '${ns}' created successfully."
-                } else {
-                    echo "Namespace '${ns}' already exists."
+                    def namespaces = ['dev', 'prod']
+
+                    namespaces.each { ns ->
+                        def nsExists = sh(script: "kubectl get namespace ${ns} --ignore-not-found=true", returnStatus: true) == 0
+
+                        if (nsExists) {
+                            echo "Namespace '${ns}' already exists. Skipping creation."
+                        } else {
+                            def namespaceYaml = """
+                            apiVersion: v1
+                            kind: Namespace
+                            metadata:
+                                name: ${ns}
+                            """
+                            
+                            writeFile file: "${ns}-namespace.yaml", text: namespaceYaml
+                            sh "kubectl apply -f ${ns}-namespace.yaml"
+                            echo "Namespace '${ns}' created successfully."
+                        }
+                    }
                 }
             }
-            
-            // Debugging: Ensure the correct context is used
-            echo "Current Kubernetes context:"
-            sh "kubectl config current-context"
-            sh "minikube status"  // Check minikube status
-
-            echo "Listing all namespaces to verify creation:"
-            sh "kubectl get namespaces"
         }
-    }
-}
 
         stage('Verify Namespaces') {
             steps {
@@ -123,7 +99,7 @@ pipeline {
             }
         }
 
-        stage("DEV Deployment") {
+        stage("Deployment Stage") {
             steps {
                 script {
                     def namespace = params.DEPLOY_ENV
