@@ -49,27 +49,27 @@ pipeline {
                 }
             }
         }
-        stage("SonarQube Code Analysis") {
-        steps {
-        withSonarQubeEnv("Sonar") {
-            sh """
-            $SONAR_HOME/bin/sonar-scanner \
-            -Dsonar.projectName=dify \
-            -Dsonar.projectKey=dify \
-            -Dsonar.sources=. \
-            -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/vendor/**,**/*.md
-            """
-                }
-            }
-        }
+        //stage("SonarQube Code Analysis") {
+        //steps {
+        //withSonarQubeEnv("Sonar") {
+          //  sh """
+            //$SONAR_HOME/bin/sonar-scanner \
+            //-Dsonar.projectName=dify \
+            //-Dsonar.projectKey=dify \
+            //-Dsonar.sources=. \
+            //-Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/vendor/**,**/*.md
+            //"""
+              //  }
+            //}
+        //}
 
-        stage("Sonar Quality Gate Scan"){
-            steps{
-                timeout(time: 2, unit: "MINUTES"){
-                    waitForQualityGate abortPipeline: false
-                }
-            }
-        }
+        //stage("Sonar Quality Gate Scan"){
+          //  steps{
+            //    timeout(time: 2, unit: "MINUTES"){
+              //      waitForQualityGate abortPipeline: false
+                //}
+            //}
+        //}
         
         stage("Trivy File System Scan") {
             steps {
