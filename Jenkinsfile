@@ -114,7 +114,7 @@ pipeline {
                     } else {
                         sh "helm repo add dify https://borispolonsky.github.io/dify-helm"
                         sh "helm repo update"
-                        sh "helm install my-release dify/dify"
+                        sh "helm upgrade --install release dify/dify"
                     }
                 }
             }
