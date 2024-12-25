@@ -94,19 +94,8 @@ Dify is an open-source LLM app development platform. Its intuitive interface com
 
 # DevSecOps Project
 ## Introduction
-Welcome to our open source DevSecOps project! This repository serves as an educational resource for developers who want to learn how to deploy a micro-service application to **PRODUCTION** using DevSecOps principles. 
+This repository serves as an educational resource for developers who want to learn how to deploy a micro-service application to **PRODUCTION** using DevSecOps principles. 
 
-### Tools Covered:
--  Linux
--  Git and GitHub
--  Docker
--  Kubernetes
--  Docker-compose
--  Jenkins CI/CD
--  SonarQube Scan
--  SonarQube Quality Gates
--  Trivy
--  Prometheus & Grafana
 
 ## Pre-requisites to implement this project:
 
